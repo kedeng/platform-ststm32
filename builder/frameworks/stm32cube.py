@@ -235,35 +235,13 @@ env.Append(
     ],
 
     CPPDEFINES=[
-        "USE_HAL_DRIVER",
+        # "USE_HAL_DRIVER",
         ("F_CPU", "$BOARD_F_CPU")
     ],
 
     CPPPATH=[
-        "$PROJECT_SRC_DIR",
-        "$PROJECT_INCLUDE_DIR",
-        os.path.join(FRAMEWORK_DIR, "Drivers", "CMSIS", "Include"),
-        os.path.join(
-            FRAMEWORK_DIR,
-            "Drivers",
-            "CMSIS",
-            "Device",
-            "ST",
-            MCU_FAMILY.upper() + "xx",
-            "Include",
-        ),
-        os.path.join(
-            FRAMEWORK_DIR,
-            "Drivers",
-            MCU_FAMILY.upper() + "xx_HAL_Driver",
-            "Inc",
-        ),
-        os.path.join(
-            FRAMEWORK_DIR,
-            "Drivers",
-            MCU_FAMILY.upper() + "xx_HAL_Driver",
-            "Src",
-        ),
+       "$PROJECT_SRC_DIR",
+       "$PROJECT_INCLUDE_DIR",
     ],
 
     CXXFLAGS=[
@@ -289,6 +267,7 @@ if not board.get("build.ldscript", ""):
     env.Replace(LDSCRIPT_PATH=get_linker_script(
         board.get("build.mcu", ""), board.get("build.cpu", "")))
 
+"""
 #
 # Process BSP components
 #
@@ -305,7 +284,6 @@ if os.path.isdir(os.path.join(bsp_dir, "Adafruit_Shield")):
 #
 # Process Utilities
 #
-
 utils_dir = os.path.join(FRAMEWORK_DIR, "Utilities")
 if os.path.isdir(utils_dir):
     for util in os.listdir(utils_dir):
@@ -326,14 +304,15 @@ if os.path.isdir(utils_dir):
                 },
             },
         )
-
+"""
 #
 # USB libraries from ST
 #
-
+"""
 middleware_dir = os.path.join(FRAMEWORK_DIR, "Middlewares", "ST")
 for usb_lib in ("STM32_USB_Device_Library", "STM32_USB_Host_Library"):
     build_usb_libs(os.path.join(middleware_dir, usb_lib))
+"""
 
 #
 # Target: Build HAL Library
@@ -341,6 +320,7 @@ for usb_lib in ("STM32_USB_Device_Library", "STM32_USB_Host_Library"):
 
 libs = []
 
+"""
 #
 # BSP libraries
 #
@@ -375,6 +355,7 @@ env.BuildSources(
     ),
     src_filter="+<*> -<Src/*_template.c> -<Src/Legacy>",
 )
+"""
 
 #
 # CMSIS library
