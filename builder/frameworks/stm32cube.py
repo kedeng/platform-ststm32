@@ -437,7 +437,7 @@ env.BuildSources(
 #
 # CMSIS library
 #
-
+"""
 if board.get("build.stm32cube.custom_system_setup", "no") == "no":
     sources_path = os.path.join(
         FRAMEWORK_DIR,
@@ -461,13 +461,8 @@ if board.get("build.stm32cube.custom_system_setup", "no") == "no":
                 % board.get(
                     "build.stm32cube.system_file", "system_%sxx.c" % MCU_FAMILY
                 ),
-                "+<gcc/%s>"
-                % board.get(
-                    "build.stm32cube.startup_file",
-                    "startup_%s.S" % PRODUCT_LINE.lower(),
-                ),
             ],
         )
     )
-
+"""
 env.Append(LIBS=libs)
