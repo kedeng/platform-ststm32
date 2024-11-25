@@ -31,6 +31,7 @@ import re
 from SCons.Script import ARGUMENTS, DefaultEnvironment
 
 from platformio.builder.tools.piolib import PlatformIOLibBuilder
+from platformio.project.helpers import get_project_dir
 
 env = DefaultEnvironment()
 platform = env.PioPlatform()
@@ -44,6 +45,9 @@ assert PRODUCT_LINE, "Missing MCU or Product Line field"
 
 FRAMEWORK_DIR = platform.get_package_dir("framework-stm32cube%s" % MCU[5:7])
 LDSCRIPTS_DIR = platform.get_package_dir("tool-ldscripts-ststm32")
+PROJECT_DIR = get_project_dir()
+STM32LIB_DIR = os.path.join(PROJECT_DIR, 'stm32Lib')
+print(f"STM32LIB_DIR={STM32LIB_DIR}")
 assert all(os.path.isdir(d) for d in (FRAMEWORK_DIR, LDSCRIPTS_DIR))
 
 
@@ -214,6 +218,39 @@ def process_dsp_lib():
         ]
     )
 
+def getOtherCppPath():
+    cpp_path = []
+    cpp_path.append(
+        os.path.join(
+                STM32LIB_DIR,
+                "STM32F4",
+                "Drivers",
+                "STM32F4xx_StdPeriph_Driver",
+                "inc",
+        )
+     )
+
+    cpp_path.append(
+        os.path.join(
+            STM32LIB_DIR,
+            "STM32F4",
+            "Drivers",
+            "CMSIS",
+            "Device",
+            "ST",
+            "STM32F4xx",
+        )
+     )
+
+    cpp_path.append(
+        os.path.join(
+            STM32LIB_DIR,
+            "CMSIS",
+            "Core",
+            "Include",
+        )
+    )
+    return cpp_path
 
 machine_flags = [
     "-mthumb",
@@ -242,7 +279,7 @@ env.Append(
     CPPPATH=[
        "$PROJECT_SRC_DIR",
        "$PROJECT_INCLUDE_DIR",
-    ],
+    ] + getOtherCppPath(),
 
     CXXFLAGS=[
         "-fno-rtti",
@@ -356,6 +393,46 @@ env.BuildSources(
     src_filter="+<*> -<Src/*_template.c> -<Src/Legacy>",
 )
 """
+
+#
+# SPL libraries
+#
+env.BuildSources(
+    os.path.join("$BUILD_DIR", "STM32F4xx_StdPeriph_Driver"),
+    os.path.join(
+            STM32LIB_DIR,
+            "STM32F4",
+            "Drivers",
+            "STM32F4xx_StdPeriph_Driver",
+            "Src",
+    ),
+    src_filter=[
+        "-<*>",
+        "+<misc.c>",
+        "+<stm32f4xx_adc.c>",
+        "+<stm32f4xx_dac.c>",
+        "+<stm32f4xx_dcmi.c>",
+        "+<stm32f4xx_dfsdm.c>",
+        "+<stm32f4xx_dma2d.c>",
+        "+<stm32f4xx_dma.c>",
+        "+<stm32f4xx_exti.c>",
+        "+<stm32f4xx_flash.c>",
+        "+<stm32f4xx_gpio.c>",
+        "+<stm32f4xx_i2c.c>",
+        "+<stm32f4xx_iwdg.c>",
+        "+<stm32f4xx_ltdc.c>",
+        "+<stm32f4xx_pwr.c>",
+        "+<stm32f4xx_rcc.c>",
+        "+<stm32f4xx_rng.c>",
+        "+<stm32f4xx_rtc.c>",
+        "+<stm32f4xx_sdio.c>",
+        "+<stm32f4xx_spi.c>",
+        "+<stm32f4xx_syscfg.c>",
+        "+<stm32f4xx_tim.c>",
+        "+<stm32f4xx_usart.c>",
+        "+<stm32f4xx_wwdg.c>"
+    ],
+)
 
 #
 # CMSIS library
